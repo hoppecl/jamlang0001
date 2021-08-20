@@ -16,6 +16,9 @@ class JlNumber:
     value: float
     comment: JlComment = None
 
+    def __add__(self, other):
+        return JlNumber(self.value + other.value, "/* sum */")
+
 
 @dataclass
 class JlString:

@@ -3,22 +3,26 @@ from jltypes import *
 from copy import copy
 
 class UnboundVariable(Exception):
-    pass
+    def __init__(self, name):
+        self.name = name
+
+    def __repr__(self):
+        return f"Unbound Variable: {self.name}"
 
 class Environment:
     def __init__(self, parent=None):
         self.bindings = {}
         self.parent = parent
 
-    def put(self, name, value, comment=None):
+    def put(self, name, value):
         self.bindings[name] = value
 
     def get(self, name):
         if name in self.bindings:
             return self.bindings[name]
-        if parent is not None:
+        if self.parent is not None:
             return self.parent.get(name)
-        raise UnboundVariable()
+        raise UnboundVariable(name)
 
 class Interpreter(lark.visitors.Interpreter):
     def __init__(self):
@@ -30,43 +34,42 @@ class Interpreter(lark.visitors.Interpreter):
             print(self.visit(stmt))
         return None
 
-    def token_comment(self, token, index=1):
-        if len(token.children) >= index + 1:
-            return self.visit(token.children[index])
-        return None
+    def commented_expr(self, token):
+        comment = self.visit(token.children[1])
+        value = copy(self.visit(token.children[0]))
+        value.comment = comment
+        return value
     
     def comment(self, tree):
-        meta_comment = self.token_comment(tree)
-        return JlComment(tree.children[0], meta_comment)
+        return JlComment(tree.children[0])
 
     def assign(self, tree):
-        name = tree.children[0]
-        name_comment = self.token_comment(name)
-        comment = self.token_comment(tree.children[1])
-        value = self.visit(tree.children[2])
-            
-        self.environment.put(str(name.children[0]), value, name_comment)
+        name = str(tree.children[0].children[0])
+        value = self.visit(tree.children[1])
+        print(name)
+        self.environment.put(name, value)
         return value
 
     def number(self, tree):
-        comment = self.token_comment(tree)
         value = float(tree.children[0])
-        return JlNumber(value, comment)
+        return JlNumber(value)
 
     def string(self, tree):
-        comment = self.token_comment(tree)
         value = str(tree.children[0])[1:-1]
-        return JlString(value, comment)
+        return JlString(value)
 
     def unit(self, tree):
-        comment = self.token_comment(tree, 0)
-        return JlUnit(comment)
+        return JlUnit()
 
     def name(self, tree):
-        comment = self.token_comment(tree)
         name = str(tree.children[0])
         value = self.environment.get(name)
-        if comment is not None:
-            value = copy(value)
-            value.comment = comment
         return value
+
+    def bin_op(self, tree):
+        lhs = self.visit(tree.children[0])
+        rhs = self.visit(tree.children[2])
+        op = tree.children[1]
+        if op == '+':
+            return lhs + rhs
+        

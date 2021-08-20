@@ -4,5 +4,5 @@ u = () /* the unit */
 
 i2 = i /* the same integer */
 
-i4 /* the fourth integer variable */ =
-i = index + 1 /* the next index */
+j = i2 /* the fourth integer variable */
+i = i + 1 /* the next index */
