@@ -27,7 +27,7 @@ class Environment:
 class Interpreter(lark.visitors.Interpreter):
     def __init__(self):
         super().__init__()
-        self.environment = Environment()
+        self.environment = Environment(prelude)
         
     def start(self, tree):
         for stmt in tree.children:
@@ -72,4 +72,19 @@ class Interpreter(lark.visitors.Interpreter):
         op = tree.children[1]
         if op == '+':
             return lhs + rhs
-        
+        if op == '%':
+            return lhs % rhs
+
+    def call_stmt(self, tree):
+        f = self.visit(tree.children[0])
+        args = map(self.visit, tree.children[1:])
+        r = f(*args)
+        if r is None:
+            return JlUnit()
+        else:
+            return r
+    
+prelude = Environment()
+prelude.bindings = {
+    "print": JlPrimitive(print, JlComment("/*the print function*/"))
+}

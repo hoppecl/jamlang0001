@@ -17,7 +17,7 @@ bool : "true" -> true | "false" -> false
          | and_expr
 ?and_expr : and_expr "&" cmp_expr
           | cmp_expr
-?cmp_expr : cmp_expr ("==" | "<" | ">")  mul_expr -> bin_op
+!?cmp_expr : cmp_expr ("==" | "<" | ">")  mul_expr -> bin_op
          | add_expr
 !?add_expr : add_expr ("+" | "-") mul_expr -> bin_op
           | mul_expr
@@ -30,18 +30,18 @@ bool : "true" -> true | "false" -> false
            | ESCAPED_STRING -> string
            | "()" -> unit
            | name
-           | stmt
+           | assign
+           | if_expr
+           | while_expr
+           | call_expr
+           | block
 ?group_expr : "(" expr ")"
+?stmt: expr ";"
 
-?stmt: assign
-     | if_stmt
-     | while_stmt
-     | call_stmt
-     | block
 assign : name "=" expr
-if_stmt : "if" group_expr stmt ["else" stmt]
-while_stmt : "while" group_expr stmt
-call_stmt : "name" "(" expr ("," expr)* ")"
+if_expr : "if" group_expr expr ["else" expr]
+while_expr : "while" group_expr expr
+call_expr : prim_expr "(" [expr ("," expr)*] ")"
 block : "{" stmt* "}"
 name : CNAME
 

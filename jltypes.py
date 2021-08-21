@@ -19,6 +19,9 @@ class JlNumber:
     def __add__(self, other):
         return JlNumber(self.value + other.value, "/* sum */")
 
+    def __mod__(self, other):
+        return JlNumber(self.value + other.value, "/* modulo */")
+        
 
 @dataclass
 class JlString:
@@ -29,3 +32,15 @@ class JlString:
 @dataclass
 class JlUnit:
     comment: JlComment = None
+
+
+class JlPrimitive:
+    def __init__(self, callback, comment=None):
+        self.callback = callback
+        self.comment = comment
+
+    def __repr__(self):
+        return f"JlPrimitive({self.comment})"
+
+    def __call__(self, *args, **kwargs):
+        self.callback(*args, **kwargs)

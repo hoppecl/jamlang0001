@@ -1,1 +1,2 @@
-c = /*a comment*/
+y = 1;
+/*asdf*/
