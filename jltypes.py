@@ -11,20 +11,17 @@ class JlComment:
         if self.comment is not None:
             return '/*' + self.text + " " + '*/' + str(self.comment)
         return '/*' + self.text + '*/'
+
+    def __str__(self):
+        return '/*' + self.text + '*/'
     
     def __add__(self, other):
         if not isinstance(other, JlComment):
             raise TypeError()
         return JlComment(self.text + other.text)
-
-class JlValue:
-    def __str__(self):
-        if self.comment is not None:
-            return str(self.value) + " " + str(self.comment)
-        return str(self.value)
-
+    
 @dataclass
-class JlNumber(JlValue):
+class JlNumber:
     value: float
     comment: JlComment = None
     
@@ -37,6 +34,9 @@ class JlNumber(JlValue):
     def build_comment(self, name, other):
         return JlComment(f"the {name} of {self.comment.text} and {other.comment.text}")
 
+    def __str__(self):
+        return str(self.value)
+    
     def __add__(self, other):
         if not isinstance(other, JlNumber):
             raise TypeError()
@@ -87,7 +87,7 @@ class JlNumber(JlValue):
 
 
 @dataclass
-class JlString(JlValue):
+class JlString:
     value: str
     comment: JlComment = None
 
@@ -96,20 +96,20 @@ class JlString(JlValue):
         if comment is None:
             comment = JlComment(f"the string \"{value}\"")
         self.comment = comment
-
-
+        
+    def __str__(self):
+        return str(self.value)
+    
 @dataclass
 class JlUnit:
     comment: JlComment = JlComment("unit")
 
     def __str__(self):
-        if self.comment is not None:
-            return "() " + str(self.comment)
         return "()"
 
 
 @dataclass
-class JlBool(JlValue):
+class JlBool:
     value: bool
     comment: JlComment = None
 
@@ -119,6 +119,9 @@ class JlBool(JlValue):
             comment = JlComment(f"the boolean \"{value}\"")
         self.comment = comment
 
+    def __str__(self):
+        return str(self.value)
+    
     def __and__(self, other):
         if not isinstance(other, JlBool):
             raise TypeError()

@@ -35,8 +35,13 @@ class Interpreter(jlast.AstVisitor):
         return value
 
     def visit_commented_expr(self, e):
-        value = copy(self.visit(e.expr))
-        value.comment = self.visit(e.comment)
+        value = self.visit(e.expr)
+        comment = self.visit(e.comment)
+        if not isinstance(comment, JlComment):
+            raise JlTypeError(self.backtrace, e.source,
+                              f"type {type(comment).__name__} can not be used to explain values")
+        value = copy(value)
+        value.comment = comment
         return value
 
     def visit_assignment(self, a):

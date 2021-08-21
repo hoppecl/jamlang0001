@@ -27,8 +27,8 @@ class JlException(Exception):
         return bt + '\n' + str(self)
     
 class UnboundVariable(JlException):
-    def __init__(self, bt, name):
-        super().__init__(bt, name.source)
+    def __init__(self, name):
+        super().__init__([], name.source)
         self.name = name
 
     def __str__(self):

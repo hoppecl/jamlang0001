@@ -55,7 +55,7 @@ def repl():
     while True:
         print(">>> ", end='');
         source = input()
-        print(eval_source(inter, source, True))
+        print(eval_source(inter, source, False))
         inter.clear_backtrace()
 
 if len(sys.argv) >= 2:
