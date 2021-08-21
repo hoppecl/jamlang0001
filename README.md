@@ -19,7 +19,7 @@ At a first glance comments might seem to be equivalent to strings. The differenc
  Explaining comments don't have to be comment-literals:
  
      >>> let comment = /* this is a comment */
-     >>> let x = 42.0 comment.
+     >>> let x = 42.0 comment
  
  Trying to explain a value with something that is not a comment obviously results in a type error.
  
@@ -93,7 +93,7 @@ Since comments are first-class values we can manipulate them on the fly. This al
          }
     };
     let h = 4 /*the number of hours i've slept*/;
-    print(fact(h)); /*
+    print(fact(h));
 
 The output of this program is more concise:
     
@@ -138,9 +138,25 @@ The Syntax is Expression based.
 
 Multiple expressions can be grouped with curly braces. Expressions are separated with semicolons. The semicolon after the last Expression is optional. Blocks evaluate to the value of their last expression.
 
-#### Function Calls
+#### Functions
+##### Definition
+    let f = fn (arg) {
+	    print(arg);
+    };
+  
+ Functions can be defined with the keyword `fn`followed by a parenthesized list of parameters and the function body. The braces are optional, when the body is a single expression. All functions are anonymous and first-class.
+#####  Calling a function
 `print("hello")`
 Nothing special here.
+
+#### Variables
+##### Declaration
+`let x = 42`
+Variables are declared with the keyword `let` and must be initialized. Variables are lexicaly scoped. Declarations evaluate to the assigned value.
+
+##### Assignment
+`x = 100`
+Assignments evaluate to the assigned value.
 
 #### Binary Expressions
 `a + b`
@@ -157,15 +173,6 @@ Operators ordered by decreasing precedence:
 The only unusual operator is the *explain* operator (`?`). See **First Class Comments** for more details.
 The logic operators `&`and `|`are not short circuiting.
 
-
-#### Variables
-##### Declaration
-`let x = 42`
-Variables are declared with the keyword `let` and must be initialized. Variables are lexicaly scoped. Declarations evaluate to the assigned value.
-
-##### Assignment
-`x = 100`
-Assignments evaluate to the assigned value.
 
 #### Control Flow Expressions
 ##### If
