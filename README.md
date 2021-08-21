@@ -1,6 +1,25 @@
 ﻿# PlsExplain (aka jamlang0001)
 A programming language with first-class comments.
 
+### Running the Interpreter
+#### Dependencies
+The interpreter depends on python3 and lark. Lark can be installed with `pip install lark`.
+#### REPL
+When the interpreter is launched without command line parameters it starts in interactive mode
+    
+    $ ./pls_explain.py
+    >>> print("hello world")
+    hello world /*the string "hello world"*/
+    >>>
+    
+  To exit the REPL press `Ctrl-D`.
+  
+ #### Running a Program from a File
+To execute a Program written in *PlsExplain*, pass  its path as the first command line argument:
+
+    $ ./pls_explain.py examples/hello_world.jl
+    Hello World /*the string "Hello World"*/
+	
 ### First-Class Comments
 Comments are first-class values in *PlsExplain*. This means that they are expressions, can be stored in variables, passed as function arguments and be returned by functions.
     
