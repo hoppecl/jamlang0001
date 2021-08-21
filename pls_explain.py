@@ -54,7 +54,14 @@ def repl():
     inter = Interpreter()
     while True:
         print(">>> ", end='');
-        source = input()
+        try:
+            source = input()
+        except KeyboardInterrupt:
+            print()
+            continue
+        except EOFError:
+            print()
+            break
         print(eval_source(inter, source, False))
         inter.clear_backtrace()
 
