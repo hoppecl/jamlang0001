@@ -15,7 +15,7 @@ When the interpreter is launched without command line parameters it starts in in
   To exit the REPL press `Ctrl-D`.
   
  #### Running a Program from a File
-To execute a Program written in *PlsExplain*, pass  its path as the first command line argument:
+To execute a Program written in *PlsExplain*, pass the pass to the program as the first command line argument.
 
     $ ./pls_explain.py examples/hello_world.jl
     Hello World /*the string "Hello World"*/
