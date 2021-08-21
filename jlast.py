@@ -206,10 +206,10 @@ class ToAst(visitors.Transformer):
     def ESCAPED_STRING(self, s):
         return Literal(JlString(s[1:-1]))
         
-    def TRUE(self):
+    def TRUE(self, t):
         return Literal(JlBool(True))
     
-    def FALSE(self):
+    def FALSE(self, f):
         return Literal(JlBool(False))
 
     def UNIT(self):

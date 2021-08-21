@@ -64,10 +64,16 @@ class Interpreter(jlast.AstVisitor):
             return lhs < rhs
 
     def visit_and_expr(self, e):
-        return self.visit(e.lhs) and self.visit(e.rhs)
+        lhs = self.visit(e.lhs)
+        if lhs.value:
+            return self.visit(e.rhs)
+        return lhs
         
     def visit_or_expr(self, e):
-        return self.visit(e.lhs) or self.visit(e.rhs)
+        lhs = self.visit(e.lhs)
+        if not lhs.value:
+            return self.visit(e.rhs)
+        return lhs
 
     def visit_call(self, c):
         f = self.visit(c.f)
