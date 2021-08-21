@@ -52,7 +52,7 @@ class Literal(Expr):
 @dataclass
 class Name(Expr):
     name: str
-    bind_depth: int = None
+    binding_depth: int = None
     
     def accept(self, visitor):
         return visitor.visit_name(self)
@@ -65,6 +65,15 @@ class Assignment(Expr):
     
     def accept(self, visitor):
         return visitor.visit_assignment(self)
+
+
+@dataclass
+class Declaration(Expr):
+    name: Name
+    expr: Expr
+    
+    def accept(self, visitor):
+        return visitor.visit_declaration(self)
 
 @dataclass
 class IfExpr(Expr):
@@ -90,7 +99,14 @@ class CallExpr(Expr):
     
     def accept(self, visitor):
         return visitor.visit_call(self)
-     
+@dataclass
+class FnExpr(Expr):
+    params: List[Name]
+    body: Expr
+    
+    def accept(self, visitor):
+        return visitor.visit_fn_expr(self)
+          
 @dataclass
 class ExplainExpr(Expr):
     expr: Expr
@@ -130,7 +146,15 @@ class AstPrinter(AstVisitor):
 
     def visit_assignment(self, a):
         self.print_indent()
-        print("Assignment", end='')
+        print("Assignment")
+        self.visit(a.name)
+        self.indent += 1
+        self.visit(a.expr)
+        self.indent -= 1
+        
+    def visit_declaration(self, a):
+        self.print_indent()
+        print("Declaration")
         self.visit(a.name)
         self.indent += 1
         self.visit(a.expr)
@@ -138,7 +162,7 @@ class AstPrinter(AstVisitor):
 
     def visit_name(self, a):
         self.print_indent()
-        print(f"<{a.name}>")
+        print(f"<{a.name} {a.binding_depth}>")
 
     def visit_commented_expr(self, e):
         self.print_indent()
@@ -198,6 +222,13 @@ class AstPrinter(AstVisitor):
         for a in e.args:
             self.visit(a)
         self.indent -= 1
+        
+    def visit_fn_expr(self, f):
+        self.print_indent()
+        print("Function", list(map(lambda n: n.name, f.params)))
+        self.indent += 1
+        self.visit(f.body)
+        self.indent -= 1
 
     def visit_explain_expr(self, e):
         self.print_indent()
@@ -205,9 +236,10 @@ class AstPrinter(AstVisitor):
         self.indent += 1
         self.visit(e.expr)
         self.indent -= 1
+        
 class TransformLiterals(visitors.Transformer):
     def COMMENT(self, c):
-        return Literal(c, JlComment(c))
+        return Literal(c, JlComment(c[2:-2]))
 
     def SIGNED_NUMBER(self, x):
         return Literal(x, JlNumber(float(x)))
@@ -258,6 +290,9 @@ class ToAst(visitors.Interpreter):
     def assignment(self, tree):
         return Assignment(tree, *self.visit_children(tree))
     
+    def declaration(self, tree):
+        return Declaration(tree, *self.visit_children(tree))
+    
     def if_expr(self, tree):
         return IfExpr(tree, *self.visit_children(tree))
     
@@ -267,7 +302,11 @@ class ToAst(visitors.Interpreter):
     def call_expr(self, tree):
         children = self.visit_children(tree)
         return CallExpr(tree, children[0], children[1:])
-    
+
+    def fn_expr(self, tree):
+        children = self.visit_children(tree)
+        return FnExpr(tree, children[:-1], children[-1])
+        
     def explain_expr(self, tree):
         return ExplainExpr(tree, *self.visit_children(tree))
     

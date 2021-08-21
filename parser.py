@@ -31,18 +31,22 @@ FALSE: "false"
            | UNIT
            | name
            | assignment
+           | declaration
            | if_expr
            | while_expr
            | call_expr
+           | fn_expr
            | explain_expr
            | block
 ?group_expr : "(" expr ")"
 ?stmt: expr ";"
 
 assignment : name "=" expr
+declaration : "let" name "=" expr
 if_expr : "if" group_expr expr ["else" expr]
 while_expr : "while" group_expr expr
 call_expr : prim_expr "(" [expr ("," expr)*] ")"
+fn_expr : "fn" "(" [name ("," name)*] ")" expr
 explain_expr : prim_expr "?"
 block : "{" stmt* "}"
 name : CNAME
