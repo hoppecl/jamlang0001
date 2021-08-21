@@ -1,97 +1,106 @@
 from dataclasses import dataclass
-from lark import ast_utils, visitors
+from lark import ast_utils, visitors, Token
 from typing import List
 from jltypes import *
 
-class _Expr(ast_utils.Ast):
-    pass
+@dataclass
+class Expr:
+    source: object
 
 @dataclass
-class CommentedExpr(_Expr):
-    expr: _Expr
-    comment: _Expr
+class CommentedExpr(Expr):
+    expr: Expr
+    comment: Expr
 
     def accept(self, visitor):
         return visitor.visit_commented_expr(self)
 
 @dataclass
-class BinExpr(_Expr):
-    lhs: _Expr
-    op: str
-    rhs: _Expr
+class BinExpr(Expr):
+    lhs: Expr
+    op: Token
+    rhs: Expr
     
     def accept(self, visitor):
         return visitor.visit_bin_expr(self)
+    
+    def get_location(self):
+        return SourceLoc(self.op.line, self.op.column)
 
 @dataclass
-class AndExpr(_Expr):
-    lhs: _Expr
-    rhs: _Expr
+class AndExpr(Expr):
+    lhs: Expr
+    rhs: Expr
     
     def accept(self, visitor):
         return visitor.visit_and_expr(self)
     
 @dataclass
-class OrExpr(_Expr):
-    lhs: _Expr
-    rhs: _Expr
+class OrExpr(Expr):
+    lhs: Expr
+    rhs: Expr
     
     def accept(self, visitor):
         return visitor.visit_or_exp(self)
 
 @dataclass
-class Literal(_Expr):
+class Literal(Expr):
     value: object # TODO: JlObject
     def accept(self, visitor):
         return visitor.visit_literal(self)
 
 @dataclass
-class Name(_Expr):
+class Name(Expr):
     name: str
     bind_depth: int = None
     
     def accept(self, visitor):
         return visitor.visit_name(self)
 
+
 @dataclass
-class Assignment(_Expr):
+class Assignment(Expr):
     name: Name
-    expr: _Expr
+    expr: Expr
     
     def accept(self, visitor):
         return visitor.visit_assignment(self)
 
 @dataclass
-class IfExpr(_Expr):
-    cond: _Expr
-    then_body: _Expr
-    else_body: _Expr = None
+class IfExpr(Expr):
+    cond: Expr
+    then_body: Expr
+    else_body: Expr = None
     
     def accept(self, visitor):
         return visitor.visit_if_expr(self)
 
 @dataclass
-class WhileExpr(_Expr):
-    cond: _Expr
-    body: _Expr
+class WhileExpr(Expr):
+    cond: Expr
+    body: Expr
     
     def accept(self, visitor):
         return visitor.visit_while_expr(self)
     
 @dataclass
-class CallExpr(_Expr):
-    def __init__(self, f, *args):
-        self.f = f
-        self.args = args
-    f: _Expr
-    args: List[_Expr]
+class CallExpr(Expr):
+    f: Expr
+    args: List[Expr]
     
     def accept(self, visitor):
         return visitor.visit_call(self)
-    
+     
 @dataclass
-class Block(_Expr, ast_utils.AsList):
-    exprs: List[_Expr]
+class ExplainExpr(Expr):
+    expr: Expr
+    
+    def accept(self, visitor):
+        return visitor.visit_explain_expr(self)
+       
+@dataclass
+class Block(Expr):
+    exprs: List[Expr]
     
     def accept(self, visitor):
         return visitor.visit_block(self)
@@ -189,32 +198,78 @@ class AstPrinter(AstVisitor):
         for a in e.args:
             self.visit(a)
         self.indent -= 1
-        
-        
-        
-    
-class ToAst(visitors.Transformer):
-    def start(self, exprs):
-        return Block(exprs)
-    
+
+    def visit_explain_expr(self, e):
+        self.print_indent()
+        print("Explain")
+        self.indent += 1
+        self.visit(e.expr)
+        self.indent -= 1
+class TransformLiterals(visitors.Transformer):
     def COMMENT(self, c):
-        return Literal(JlComment(c))
+        return Literal(c, JlComment(c))
 
     def SIGNED_NUMBER(self, x):
-        return Literal(JlNumber(float(x)))
+        return Literal(x, JlNumber(float(x)))
 
     def ESCAPED_STRING(self, s):
-        return Literal(JlString(s[1:-1]))
+        return Literal(s, JlString(s[1:-1]))
         
     def TRUE(self, t):
-        return Literal(JlBool(True))
+        return Literal(t, JlBool(True))
     
     def FALSE(self, f):
-        return Literal(JlBool(False))
+        return Literal(f, JlBool(False))
 
-    def UNIT(self):
-        return Literal(JlBool(False))
+    def UNIT(self, u):
+        return Literal(u, JlUnit())
 
     def CNAME(self, n):
         return str(n)
 
+# would have been nice to use lark.ast_utils for this, but I couldn't figure out how to
+# maintain line and column number when using it
+class ToAst(visitors.Interpreter):
+    def start(self, tree):
+        return Block(tree, self.visit_children(tree))
+
+    def block(self, tree):
+        return Block(tree, self.visit_children(tree))
+        
+    def __default__(self, tree):
+        print("AAAAAAA", tree)
+        return tree
+    
+    def commented_expr(self, tree):
+        return CommentedExpr(tree, *self.visit_children(tree))
+    
+    def bin_expr(self, tree):
+        return BinExpr(tree, *self.visit_children(tree))
+
+    def and_expr(self, tree):
+        return AndExpr(tree, *self.visit_children(tree))
+
+    def or_expr(self, tree):
+        return AndExpr(tree, *self.visit_children(tree))
+    
+    def name(self, tree):
+        return Name(tree, *self.visit_children(tree))
+    
+    def assignment(self, tree):
+        return Assignment(tree, *self.visit_children(tree))
+    
+    def if_expr(self, tree):
+        return IfExpr(tree, *self.visit_children(tree))
+    
+    def while_expr(self, tree):
+        return WhileExpr(tree, *self.visit_children(tree))
+    
+    def call_expr(self, tree):
+        children = self.visit_children(tree)
+        return CallExpr(tree, children[0], children[1:])
+    
+    def explain_expr(self, tree):
+        return ExplainExpr(tree, *self.visit_children(tree))
+    
+    def block_expr(self, tree):
+        return BlockExpr(tree, *self.visit_children(tree))

@@ -1,1 +1,1 @@
-print("hello");
+true + false;

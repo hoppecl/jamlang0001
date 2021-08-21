@@ -34,6 +34,7 @@ FALSE: "false"
            | if_expr
            | while_expr
            | call_expr
+           | explain_expr
            | block
 ?group_expr : "(" expr ")"
 ?stmt: expr ";"
@@ -42,6 +43,7 @@ assignment : name "=" expr
 if_expr : "if" group_expr expr ["else" expr]
 while_expr : "while" group_expr expr
 call_expr : prim_expr "(" [expr ("," expr)*] ")"
+explain_expr : prim_expr "?"
 block : "{" stmt* "}"
 name : CNAME
 
@@ -54,7 +56,7 @@ COMMENT : /\/\*[^(\*\/)]*\*\//
 %ignore WS
 """
 
-parser = lark.Lark(grammar, parser='lalr')
+parser = lark.Lark(grammar, parser='lalr', propagate_positions=True)
 
 def parse(source):
     return parser.parse(source)
