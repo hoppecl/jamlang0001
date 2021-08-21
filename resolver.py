@@ -2,19 +2,25 @@ from exceptions import UnboundVariable;
 from jlast import AstVisitor
 from prelude import prelude
 
+
 class Resolver(AstVisitor):
-    def __init__(self):
+    def __init__(self, env=None):
         super().__init__()
         self.scopes = []
-        self.scopes.append(set(prelude.bindings.keys()))
-        self.scopes.append(set())
+        if env is None:
+            self.scopes.append(set(prelude.bindings.keys()))
+            self.scopes.append(set())
+        else:
+            while env is not None:
+                self.scopes.insert(0, set(env.bindings.keys()))
+                env = env.parent
 
     def begin_scope(self):
         self.scopes.append(set())
 
     def end_scope(self):
         self.scopes.pop(-1)
-    
+
     def visit_block(self, b):
         self.begin_scope()
         for stmt in b.exprs:

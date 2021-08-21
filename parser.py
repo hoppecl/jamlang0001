@@ -61,9 +61,6 @@ COMMENT : /\/\*[^(\*\/)]*\*\//
 """
 
 parser = lark.Lark(grammar, parser='lalr', propagate_positions=True)
-
+expr_parser = lark.Lark(grammar, start='expr', parser='lalr', propagate_positions=True)
 def parse(source):
     return parser.parse(source)
-
-def lex(source):
-    return parser.lex(source)
