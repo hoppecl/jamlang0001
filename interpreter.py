@@ -9,6 +9,7 @@ class Interpreter(jlast.AstVisitor):
     def __init__(self):
         super().__init__()
         self.environment = Environment(prelude)
+        self.backtrace = []
 
     def eval_with_env(self, expr, env):
         saved_env = self.environment
@@ -16,6 +17,9 @@ class Interpreter(jlast.AstVisitor):
         value = self.visit(expr)
         self.environment = saved_env
         return value
+
+    def clear_backtrace(self):
+        self.backtrace = []
         
     def visit_program(self, b):
         for stmt in b.exprs:
@@ -56,7 +60,7 @@ class Interpreter(jlast.AstVisitor):
     def visit_name(self, n):
         value = self.environment.get(n)
         if value is None:
-            raise UnboundVariable(n)
+            raise UnboundVariable(self.backtrace, n)
         return value
 
     def visit_bin_expr(self, e):
@@ -82,8 +86,8 @@ class Interpreter(jlast.AstVisitor):
             if e.op == '>':
                 return lhs > rhs
         except TypeError:
-            raise JlTypeError(e.source,
-                              f"`{e.op}` possible for types {type(lhs).__name__} and {type(rhs).__name__}")
+            raise JlTypeError(self.backtrace, e.source,
+                              f"`{e.op}` not possible for types {type(lhs).__name__} and {type(rhs).__name__}")
 
     def visit_and_expr(self, e):
         return self.visit(e.lhs) & self.visit(e.rhs)
@@ -98,8 +102,11 @@ class Interpreter(jlast.AstVisitor):
         f = self.visit(c.f)
         args = list(map(self.visit, c.args))
         if not isinstance(f, JlCallable):
-            raise JlTypeError(c.source, f"{type(f).__name__} is not callable")
+            raise JlTypeError(self.backtrace,
+                              c.source, f"{type(f).__name__} is not callable")
+        self.backtrace.append(c.source)
         r = f.call(self, args)
+        self.backtrace.pop()
         if r is None:
             return JlUnit()
         else:

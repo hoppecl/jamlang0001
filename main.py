@@ -6,7 +6,7 @@ from parser import parser
 from jlast import TransformLiterals, ToAst, AstPrinter
 from interpreter import Interpreter
 from resolver import Resolver
-from exceptions import JlTypeError, UnboundVariable
+from exceptions import JlException
 
 to_ast_transformer =  ToAst()
 literal_transformer = TransformLiterals()
@@ -26,15 +26,17 @@ def eval_source(interpreter, source, debug=True):
 
         return interpreter.visit(ast)
 
-    except lark.exceptions.UnexpectedInput as e:
-        print(f"{e.line}:{e.column} syntax error"),
+    except lark.exceptions.UnexpectedToken as e:
+        print(f"{e.line}:{e.column} syntax error: expected one of {e.expected}"),
         print(e.get_context(source))
-    except JlTypeError as e:
-        print(f"{e.line}:{e.column} type error: {e.msg}"),
+    except lark.exceptions.UnexpectedCharacters as e:
+        print(f"{e.line}:{e.column} syntax error: unexpected characters"),
         print(e.get_context(source))
-    except UnboundVariable as e:
-        print(f"{e.line}:{e.column} unbound variable {e.name.name}"),
+    except lark.exceptions.UnexpectedEOF as e:
+        print(f"{e.line}:{e.column} syntax error: unexpected end of file"),
         print(e.get_context(source))
+    except JlException as e:
+        print(e.get_backtrace(source))
 
 
 def run_file(path, debug=False):
@@ -54,7 +56,7 @@ def repl():
         print(">>> ", end='');
         source = input()
         print(eval_source(inter, source, True))
-        print(inter.environment.bindings)
+        inter.clear_backtrace()
 
 if len(sys.argv) >= 2:
     run_file(sys.argv[1])
