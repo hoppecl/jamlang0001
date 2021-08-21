@@ -7,11 +7,10 @@ from dataclasses import dataclass
 grammar = r"""
 
 start : stmt+
-comment : COMMENT
 bool : "true" -> true | "false" -> false
 
 ?expr : commented_expr
-?commented_expr : or_expr comment
+?commented_expr : or_expr commented_expr
                 | or_expr
 ?or_expr : or_expr "|" and_expr
          | and_expr
@@ -23,7 +22,7 @@ bool : "true" -> true | "false" -> false
           | mul_expr
 !?mul_expr : mul_expr ("*" | "/" | "%") prim_expr -> bin_op
            | prim_expr
-?prim_expr : comment
+?prim_expr : COMMENT -> comment
            | group_expr
            | bool
            | SIGNED_NUMBER -> number

@@ -17,11 +17,17 @@ class JlNumber:
     comment: JlComment = None
 
     def __add__(self, other):
-        return JlNumber(self.value + other.value, "/* sum */")
+        return JlNumber(self.value + other.value, JlComment("/* sum */"))
 
     def __mod__(self, other):
-        return JlNumber(self.value + other.value, "/* modulo */")
+        return JlNumber(self.value % other.value, JlComment("/* modulo */"))
         
+    def __eq__(self, other):
+        return JlBool(self.value == other.value, JlComment("/* equal */"))
+    
+    def __lt__(self, other):
+        return JlBool(self.value < other.value, JlComment("/* less */"))
+
 
 @dataclass
 class JlString:
@@ -44,3 +50,12 @@ class JlPrimitive:
 
     def __call__(self, *args, **kwargs):
         self.callback(*args, **kwargs)
+
+
+@dataclass
+class JlBool:
+    value: bool
+    comment: JlComment = None
+
+    def __and__(self, other):
+        return JlBool(self.value and other.value, JlComment("/* and */"))

@@ -24,6 +24,9 @@ class Environment:
             return self.parent.get(name)
         raise UnboundVariable(name)
 
+class LiteralTransformer(lark.visitors.Transformer):
+    def COMMENT(self, children):
+        return JlComment
 class Interpreter(lark.visitors.Interpreter):
     def __init__(self):
         super().__init__()
@@ -46,7 +49,6 @@ class Interpreter(lark.visitors.Interpreter):
     def assign(self, tree):
         name = str(tree.children[0].children[0])
         value = self.visit(tree.children[1])
-        print(name)
         self.environment.put(name, value)
         return value
 
@@ -74,8 +76,26 @@ class Interpreter(lark.visitors.Interpreter):
             return lhs + rhs
         if op == '%':
             return lhs % rhs
+        if op == '==':
+            return lhs == rhs
+        if op == '<':
+            return lhs < rhs
 
-    def call_stmt(self, tree):
+    def and_expr(self, tree):
+        lhs = self.visit(tree.children[0])
+        if lhs.value:
+            rhs = self.visit(tree.children[1])
+            return rhs
+        return lhs
+        
+    def or_expr(self, tree):
+        lhs = self.visit(tree.children[0])
+        if not lhs.value:
+            rhs = self.visit(tree.children[1])
+            return rhs
+        return lhs
+
+    def call_expr(self, tree):
         f = self.visit(tree.children[0])
         args = map(self.visit, tree.children[1:])
         r = f(*args)
@@ -83,6 +103,32 @@ class Interpreter(lark.visitors.Interpreter):
             return JlUnit()
         else:
             return r
+
+    def while_expr(self, tree):
+        cond = tree.children[0]
+        body = tree.children[1]
+        while self.visit(cond).value:
+            value = self.visit(body)
+        return value
+
+    def if_expr(self, tree):
+        if self.visit(tree.children[0]).value:
+            return self.visit(tree.children[1])
+        elif len(tree.children) == 3:
+            return self.visit(tree.children[2])
+        return JlUnit()
+        
+    def block(self, tree):
+        value = JlUnit()
+        for stmt in tree.children:
+            value = self.visit(stmt)
+        return value
+
+    def true(self, tree):
+        return JlBool(True)
+    
+    def false(self, tree):
+        return JlBool(False)
     
 prelude = Environment()
 prelude.bindings = {
