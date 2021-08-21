@@ -5,8 +5,8 @@ let a = "global";
     };
 
     print(a);
-    showA(1);
+    showA();
     let a = "local";
-    showA(1);
+    showA();
     print(a);
 };

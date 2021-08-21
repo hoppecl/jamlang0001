@@ -28,7 +28,7 @@ FALSE: "false"
            | FALSE
            | SIGNED_NUMBER
            | ESCAPED_STRING
-           | UNIT
+           | unit
            | name
            | assignment
            | declaration
@@ -41,6 +41,7 @@ FALSE: "false"
 ?group_expr : "(" expr ")"
 ?stmt: expr ";"
 
+!unit : "(" ")"
 assignment : name "=" expr
 declaration : "let" name "=" expr
 if_expr : "if" group_expr expr ["else" expr]
@@ -62,5 +63,3 @@ COMMENT : /\/\*[^(\*\/)]*\*\//
 
 parser = lark.Lark(grammar, parser='lalr', propagate_positions=True)
 expr_parser = lark.Lark(grammar, start='expr', parser='lalr', propagate_positions=True)
-def parse(source):
-    return parser.parse(source)

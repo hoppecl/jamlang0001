@@ -253,7 +253,7 @@ class TransformLiterals(visitors.Transformer):
     def FALSE(self, f):
         return Literal(f, JlBool(False))
 
-    def UNIT(self, u):
+    def unit(self, u):
         return Literal(u, JlUnit())
 
     def CNAME(self, n):
