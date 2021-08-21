@@ -12,7 +12,7 @@ class CommentedExpr(_Expr):
     comment: _Expr
 
     def accept(self, visitor):
-        visitor.visit_commented_expr(self)
+        return visitor.visit_commented_expr(self)
 
 @dataclass
 class BinExpr(_Expr):
@@ -21,7 +21,7 @@ class BinExpr(_Expr):
     rhs: _Expr
     
     def accept(self, visitor):
-        visitor.visit_bin_expr(self)
+        return visitor.visit_bin_expr(self)
 
 @dataclass
 class AndExpr(_Expr):
@@ -29,7 +29,7 @@ class AndExpr(_Expr):
     rhs: _Expr
     
     def accept(self, visitor):
-        visitor.visit_and_expr(self)
+        return visitor.visit_and_expr(self)
     
 @dataclass
 class OrExpr(_Expr):
@@ -37,13 +37,13 @@ class OrExpr(_Expr):
     rhs: _Expr
     
     def accept(self, visitor):
-        visitor.visit_or_exp(self)
+        return visitor.visit_or_exp(self)
 
 @dataclass
 class Literal(_Expr):
     value: object # TODO: JlObject
     def accept(self, visitor):
-        visitor.visit_literal(self)
+        return visitor.visit_literal(self)
 
 @dataclass
 class Name(_Expr):
@@ -51,7 +51,7 @@ class Name(_Expr):
     bind_depth: int = None
     
     def accept(self, visitor):
-        visitor.visit_name(self)
+        return visitor.visit_name(self)
 
 @dataclass
 class Assignment(_Expr):
@@ -59,7 +59,7 @@ class Assignment(_Expr):
     expr: _Expr
     
     def accept(self, visitor):
-        visitor.visit_assignment(self)
+        return visitor.visit_assignment(self)
 
 @dataclass
 class IfExpr(_Expr):
@@ -68,7 +68,7 @@ class IfExpr(_Expr):
     else_body: _Expr = None
     
     def accept(self, visitor):
-        visitor.visit_if_expr(self)
+        return visitor.visit_if_expr(self)
 
 @dataclass
 class WhileExpr(_Expr):
@@ -76,7 +76,7 @@ class WhileExpr(_Expr):
     body: _Expr
     
     def accept(self, visitor):
-        visitor.visit_while_expr(self)
+        return visitor.visit_while_expr(self)
     
 @dataclass
 class CallExpr(_Expr):
@@ -87,18 +87,18 @@ class CallExpr(_Expr):
     args: List[_Expr]
     
     def accept(self, visitor):
-        visitor.visit_call(self)
+        return visitor.visit_call(self)
     
 @dataclass
 class Block(_Expr, ast_utils.AsList):
     exprs: List[_Expr]
     
     def accept(self, visitor):
-        visitor.visit_block(self)
+        return visitor.visit_block(self)
 
 class AstVisitor:
     def visit(self, ast):
-        ast.accept(self)
+        return ast.accept(self)
         
 class AstPrinter(AstVisitor):
     def __init__(self):
