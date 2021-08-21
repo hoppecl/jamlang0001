@@ -120,6 +120,13 @@ class Block(Expr):
     
     def accept(self, visitor):
         return visitor.visit_block(self)
+    
+@dataclass
+class Program(Expr):
+    exprs: List[Expr]
+    
+    def accept(self, visitor):
+        return visitor.visit_program(self)
 
 class AstVisitor:
     def visit(self, ast):
@@ -132,6 +139,14 @@ class AstPrinter(AstVisitor):
     def print_indent(self):
         print(" |" * self.indent, end='')
 
+    def visit_program(self, block):
+        self.print_indent()
+        print('Program')
+        self.indent += 1
+        for e in block.exprs:
+            self.visit(e)
+        self.indent -= 1
+        
     def visit_block(self, block):
         self.print_indent()
         print('Block')
@@ -142,7 +157,7 @@ class AstPrinter(AstVisitor):
 
     def visit_literal(self, lit):
         self.print_indent()
-        print(lit.value)
+        print(repr(lit.value))
 
     def visit_assignment(self, a):
         self.print_indent()
@@ -262,8 +277,8 @@ class TransformLiterals(visitors.Transformer):
 # would have been nice to use lark.ast_utils for this, but I couldn't figure out how to
 # maintain line and column number when using it
 class ToAst(visitors.Interpreter):
-    def start(self, tree):
-        return Block(tree, self.visit_children(tree))
+    def program(self, tree):
+        return Program(tree, self.visit_children(tree))
 
     def block(self, tree):
         return Block(tree, self.visit_children(tree))

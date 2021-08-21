@@ -1,2 +1,1 @@
-let n = 8;
-n + 8;
+print("test" /*the string "test"*/);

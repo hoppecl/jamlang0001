@@ -16,6 +16,11 @@ class Interpreter(jlast.AstVisitor):
         value = self.visit(expr)
         self.environment = saved_env
         return value
+        
+    def visit_program(self, b):
+        for stmt in b.exprs:
+           value = self.visit(stmt)
+        return value
     
     def visit_block(self, b):
         saved_env = self.environment
@@ -64,20 +69,24 @@ class Interpreter(jlast.AstVisitor):
                 return lhs - rhs
             if e.op == '*':
                 return lhs * rhs
+            if e.op == '*':
+                return lhs * rhs
+            if e.op == '/':
+                return lhs / rhs
             if e.op == '%':
                 return lhs % rhs
             if e.op == '==':
                 return lhs == rhs
             if e.op == '<':
                 return lhs < rhs
+            if e.op == '>':
+                return lhs > rhs
         except TypeError:
-            raise JlTypeError(e.source)
+            raise JlTypeError(e.source,
+                              f"`{e.op}` possible for types {type(lhs).__name__} and {type(rhs).__name__}")
 
     def visit_and_expr(self, e):
-        lhs = self.visit(e.lhs)
-        if lhs.value:
-            return self.visit(e.rhs)
-        return lhs
+        return self.visit(e.lhs) & self.visit(e.rhs)
         
     def visit_or_expr(self, e):
         lhs = self.visit(e.lhs)
@@ -89,7 +98,7 @@ class Interpreter(jlast.AstVisitor):
         f = self.visit(c.f)
         args = list(map(self.visit, c.args))
         if not isinstance(f, JlCallable):
-            raise TypeError(c.source)
+            raise JlTypeError(c.source, f"{type(f).__name__} is not callable")
         r = f.call(self, args)
         if r is None:
             return JlUnit()

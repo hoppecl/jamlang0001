@@ -1,9 +1,13 @@
 let fact = fn(n) {
-     let explanation = /* the factorial of*/ + n?;
-     if (n == 0)
+     if (n == 0) {
         1
-     else
-        (fact(n - 1) * n) explanation;
+     } else {
+        /* lets add a helpfull comment to the return value */;
+        (fact(n - 1) * n) { /* the factorial of */ + n? };
+     }
 };
 
-print(fact(10 /* the number ten */));
+let h = 4 /*the number of hours i've slept*/;
+
+print(fact(h));
+

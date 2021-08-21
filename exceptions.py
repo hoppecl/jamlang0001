@@ -14,7 +14,8 @@ class UnboundVariable(JlException):
         super().__init__(name.source)
         self.name = name
 
-
 class JlTypeError(JlException):
-    pass
+    def __init__(self, expr, msg):
+        super().__init__(expr)
+        self.msg = msg
 

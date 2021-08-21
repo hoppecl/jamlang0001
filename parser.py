@@ -5,8 +5,8 @@ import sys
 from dataclasses import dataclass
 
 grammar = r"""
+program : stmt* [expr]
 
-start : stmt+
 TRUE: "true"
 FALSE: "false"
 ?expr : commented_expr
@@ -49,7 +49,7 @@ while_expr : "while" group_expr expr
 call_expr : prim_expr "(" [expr ("," expr)*] ")"
 fn_expr : "fn" "(" [name ("," name)*] ")" expr
 explain_expr : prim_expr "?"
-block : "{" stmt* "}"
+block : "{" stmt* [expr]"}"
 name : CNAME
 
 UNIT: "()"
@@ -61,5 +61,4 @@ COMMENT : /\/\*[^(\*\/)]*\*\//
 %ignore WS
 """
 
-parser = lark.Lark(grammar, parser='lalr', propagate_positions=True)
-expr_parser = lark.Lark(grammar, start='expr', parser='lalr', propagate_positions=True)
+parser = lark.Lark(grammar, start='program', parser='lalr', propagate_positions=True)

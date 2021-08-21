@@ -21,6 +21,10 @@ class Resolver(AstVisitor):
     def end_scope(self):
         self.scopes.pop(-1)
 
+    def visit_program(self, b):
+        for stmt in b.exprs:
+            self.visit(stmt)
+        
     def visit_block(self, b):
         self.begin_scope()
         for stmt in b.exprs:
