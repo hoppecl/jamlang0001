@@ -62,7 +62,7 @@ def repl():
         except EOFError:
             print()
             break
-        print(eval_source(inter, source, False))
+        print(eval_source(inter, source, True))
         inter.clear_backtrace()
 
 if len(sys.argv) >= 2:

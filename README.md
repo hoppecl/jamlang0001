@@ -1,9 +1,9 @@
 ﻿# PlsExplain (aka jamlang0001)
-A programming language with first-class comments.
+A small dynamically typed programming language with first-class comments.
 
 ### Running the Interpreter
 #### Dependencies
-The interpreter depends on python3 and lark. Lark can be installed with `pip install lark`.
+The interpreter depends on python3 and [lark](https://github.com/lark-parser/lark). Lark can be installed with `pip install lark`.
 #### REPL
 When the interpreter is launched without command line parameters it starts in interactive mode
     

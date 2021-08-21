@@ -28,22 +28,6 @@ class BinExpr(Expr):
         return SourceLoc(self.op.line, self.op.column)
 
 @dataclass
-class AndExpr(Expr):
-    lhs: Expr
-    rhs: Expr
-    
-    def accept(self, visitor):
-        return visitor.visit_and_expr(self)
-    
-@dataclass
-class OrExpr(Expr):
-    lhs: Expr
-    rhs: Expr
-    
-    def accept(self, visitor):
-        return visitor.visit_or_exp(self)
-
-@dataclass
 class Literal(Expr):
     value: object # TODO: JlObject
     def accept(self, visitor):
@@ -203,22 +187,6 @@ class AstPrinter(AstVisitor):
         self.visit(e.rhs)
         self.indent -= 1
         
-    def visit_and_expr(self, e):
-        self.print_indent()
-        print("And")
-        self.indent += 1
-        self.visit(e.lhs)
-        self.visit(e.rhs)
-        self.indent -= 1
-        
-    def visit_or_expr(self, e):
-        self.print_indent()
-        print("Or")
-        self.indent += 1
-        self.visit(e.lhs)
-        self.visit(e.rhs)
-        self.indent -= 1
-        
     def visit_if_expr(self, e):
         self.print_indent()
         print("If")
@@ -280,40 +248,33 @@ class ToAst(visitors.Interpreter):
     def program(self, tree):
         return Program(tree, self.visit_children(tree))
 
+    def __default__(self, tree):
+        assert False
+
     def block(self, tree):
         return Block(tree, self.visit_children(tree))
-        
-    def __default__(self, tree):
-        print("AAAAAAA", tree)
-        return tree
-    
+
     def commented_expr(self, tree):
         return CommentedExpr(tree, *self.visit_children(tree))
-    
+
     def bin_expr(self, tree):
         return BinExpr(tree, *self.visit_children(tree))
 
-    def and_expr(self, tree):
-        return AndExpr(tree, *self.visit_children(tree))
-
-    def or_expr(self, tree):
-        return AndExpr(tree, *self.visit_children(tree))
-    
     def name(self, tree):
         return Name(tree, *self.visit_children(tree))
-    
+
     def assignment(self, tree):
         return Assignment(tree, *self.visit_children(tree))
-    
+
     def declaration(self, tree):
         return Declaration(tree, *self.visit_children(tree))
-    
+
     def if_expr(self, tree):
         return IfExpr(tree, *self.visit_children(tree))
-    
+
     def while_expr(self, tree):
         return WhileExpr(tree, *self.visit_children(tree))
-    
+
     def call_expr(self, tree):
         children = self.visit_children(tree)
         return CallExpr(tree, children[0], children[1:])
@@ -321,9 +282,6 @@ class ToAst(visitors.Interpreter):
     def fn_expr(self, tree):
         children = self.visit_children(tree)
         return FnExpr(tree, children[:-1], children[-1])
-        
+
     def explain_expr(self, tree):
         return ExplainExpr(tree, *self.visit_children(tree))
-    
-    def block_expr(self, tree):
-        return BlockExpr(tree, *self.visit_children(tree))

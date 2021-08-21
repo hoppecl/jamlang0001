@@ -72,6 +72,10 @@ class Interpreter(jlast.AstVisitor):
         lhs = self.visit(e.lhs)
         rhs = self.visit(e.rhs)
         try:
+            if e.op == '&':
+                return lhs & rhs
+            if e.op == '|':
+                return lhs | rhs
             if e.op == '+':
                 return lhs + rhs
             if e.op == '-':
@@ -90,6 +94,7 @@ class Interpreter(jlast.AstVisitor):
                 return lhs < rhs
             if e.op == '>':
                 return lhs > rhs
+            assert False
         except TypeError:
             raise JlTypeError(self.backtrace, e.source,
                               f"`{e.op}` not possible for types {type(lhs).__name__} and {type(rhs).__name__}")

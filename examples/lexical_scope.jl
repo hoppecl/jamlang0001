@@ -4,9 +4,9 @@ let a = "global";
         print(a);
     };
 
-    print(a);
-    showA();
+    print(a) /* prints "global" */;
+    showA() /* prints "global" */;
     let a = "local";
-    showA();
-    print(a);
+    showA() /* prints "global" */;
+    print(a) /* prints "local" */;
 };

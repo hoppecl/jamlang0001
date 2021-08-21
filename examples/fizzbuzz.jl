@@ -1,12 +1,13 @@
-i = 1
-while /*while comment*/ (i < 100) {
+let i = 1;
+while (i < 100) {
     if (i % 3 == 0 & i % 5 == 0) {
-        print("fizzbuzz")
+        print("fizzbuzz");
     } else if (i % 3 == 0) {
-        print("fizz")
+        print("fizz");
     } else if (i % 5 == 0) {
-        print("buzz")
+        print("buzz");
     } else {
-        print(i)
-    }
+        print(i);
+    };
+    i = i + 1 /*incremented counter*/;
 }

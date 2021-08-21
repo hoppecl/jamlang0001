@@ -20,9 +20,9 @@ FALSE: "false"
 ?expr : commented_expr
 ?commented_expr : or_expr commented_expr
                 | or_expr
-?or_expr : or_expr "|" and_expr
+!?or_expr : or_expr "|" and_expr -> bin_expr
          | and_expr
-?and_expr : and_expr "&" cmp_expr
+!?and_expr : and_expr "&" cmp_expr -> bin_expr
           | cmp_expr
 !?cmp_expr : cmp_expr ("==" | "<" | ">")  mul_expr -> bin_expr
          | add_expr
