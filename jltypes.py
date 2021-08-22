@@ -175,3 +175,16 @@ class JlClosure(JlCallable):
 
     def get_arity(self):
         return len(self.params)
+
+
+class JlList(Value):
+    def default_comment(self):
+        if len(self.value) == 0:
+            return JlComment("an empty list")
+        vals = " and ".join([v.get_comment().value for v in self.value])
+        return JlComment(f"a list of {vals}")
+
+    def __str__(self):
+        vals = ", ".join(map(str, self.value))
+        return "[" + vals + "]"
+        

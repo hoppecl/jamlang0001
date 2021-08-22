@@ -38,8 +38,8 @@ class Interpreter(jlast.AstVisitor):
         value = self.visit(e.expr)
         comment = self.visit(e.comment)
         if not isinstance(comment, JlComment):
-            raise JlTypeError(self.backtrace, e.location,
-                              f"type {type(comment).__name__} can not be used to explain values")
+            raise JlTypeError(f"type {type(comment).__name__} can not be used to explain values",
+                              self.backtrace, e.location)
         value = copy(value)
         value.set_comment(comment)
         return value
@@ -92,8 +92,8 @@ class Interpreter(jlast.AstVisitor):
             assert False
         except TypeError:
             raise
-            raise JlTypeError(self.backtrace, e.location,
-                              f"`{e.op}` not possible for types {type(lhs).__name__} and {type(rhs).__name__}")
+            raise JlTypeError(f"`{e.op}` not possible for types {type(lhs).__name__} and {type(rhs).__name__}",
+                              self.backtrace, e.location,)
 
     def visit_and_expr(self, e):
         return self.visit(e.lhs) & self.visit(e.rhs)
@@ -108,14 +108,19 @@ class Interpreter(jlast.AstVisitor):
         f = self.visit(c.f)
         args = list(map(self.visit, c.args))
         if not isinstance(f, JlCallable):
-            raise JlTypeError(self.backtrace,
-                              c.location, f"{type(f).__name__} is not callable")
+            raise JlTypeError(c.location, f"{type(f).__name__} is not callable",
+                              self.backtrace, c.location)
         arity = f.get_arity()
         if arity is not None and len(args) != arity:
-            raise JlTypeError(self.backtrace,
-                              c.location, f"wrong number of arguments")
+            raise JlTypeError(f"wrong number of arguments",
+                              self.backtrace, c.location)
         self.backtrace.append(c.location)
-        r = f.call(self, args)
+        try:
+            r = f.call(self, args)
+        except JlException as e:
+            e.backtrace = self.backtrace
+            raise e
+        
         self.backtrace.pop()
         if r is None:
             return JlUnit()

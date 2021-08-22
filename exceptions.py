@@ -27,8 +27,10 @@ def format_backtrace(backtrace, text):
 
 
 class JlException(Exception):
-    def __init__(self, backtrace, location):
-        self.backtrace = backtrace + [location]
+    def __init__(self, backtrace=None, location=None):
+        self.backtrace = backtrace or []
+        if location is not None:
+            self.backtrace = self.backtrace + [location]
 
     def get_backtrace(self, text):
         return format_backtrace(self.backtrace, text) + '\n' + str(self)
@@ -53,7 +55,7 @@ class UninizializedVariable(JlException):
 
 
 class JlTypeError(JlException):
-    def __init__(self, bt, expr, msg):
+    def __init__(self, msg, bt=None, expr=None):
         super().__init__(bt, expr)
         self.msg = msg
 
