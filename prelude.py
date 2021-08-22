@@ -1,6 +1,8 @@
+from random import randint
 from environment import Environment
 from jltypes import *
 from exceptions import JlTypeError
+
 
 def jl_print(*args):
     if len(args) == 1:
@@ -67,6 +69,22 @@ def jl_get(list, index):
     return JlUnit()
 
 
+def jl_len(list):
+    if not isinstance(list, JlList) and not isinstance(list, JlString):
+        raise JlTypeError("first argument must be a list or string")
+    return JlNumber(len(list.value),
+                    JlComment(f"the length of {list.get_comment().value}"))
+
+
+def jl_randint(min, max):
+    if not isinstance(min, JlNumber):
+        raise JlTypeError("first argument must be a number")
+    if not isinstance(max, JlNumber):
+        raise JlTypeError("second argument must be a number")
+    return JlNumber(randint(min.value, max.value),
+                    JlComment(f"a random integer between {min} and {max}"))
+
+
 prelude = Environment()
 prelude.bindings = {
     "print": JlPrimitive(jl_print, None, JlComment("the builtin print function")),
@@ -78,4 +96,6 @@ prelude.bindings = {
     "append": JlPrimitive(jl_append, 2, JlComment("the builtin append function")),
     "put": JlPrimitive(jl_put, 3, JlComment("the builtin put function")),
     "get": JlPrimitive(jl_get, 2, JlComment("the builtin get function")),
+    "len": JlPrimitive(jl_len, 1, JlComment("the builtin len function")),
+    "randint": JlPrimitive(jl_randint, 2, JlComment("the builtin randint function")),
 }
