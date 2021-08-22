@@ -156,6 +156,7 @@ Currently there is no special syntax for lists, instead the builtin functions `l
 
 ### Syntax
 The Syntax is Expression based.
+
 #### Literals
 | Type  | Examples |
 |--|--|
@@ -182,19 +183,26 @@ Multiple expressions can be grouped with curly braces. Expressions are separated
  Functions can be defined with the keyword `fn`followed by a parenthesized list of parameters and the function body. The braces are optional, when the body is a single expression. All functions are anonymous and first-class.
 #####  Calling a function
 `print("hello")`
+
 Nothing special here.
 
 #### Variables
 ##### Declaration
 `let x = 42`
+
 Variables are declared with the keyword `let` and must be initialized. Variables are lexicaly scoped. Declarations evaluate to the assigned value.
 
 ##### Assignment
 `x = 100`
+
 Assignments evaluate to the assigned value.
+
+#### Unary Expressions
+`-a` `!b` Nothing unusual.
 
 #### Binary Expressions
 `a + b`
+
 Operators ordered by decreasing precedence:
 | Operators | Examples |
 |--|--|
@@ -212,9 +220,11 @@ The logic operators `&`and `|`are not short circuiting.
 #### Control Flow Expressions
 ##### If
 `if (condition) { "true" } else { "false" }`
+
 Parenthesis around the condition are mandatory. Braces around single expressions and the `else` branch are optional. If expressions evaluate to the value of the taken branch.
 ##### While
 `while (condition) { do_something() }`
+
 Parenthesis around the condition are mandatory. The Braces cant be omitted, if the body is a single expression. While loops evaluate to the value of the loop body during the last iteration.
 
 ### Build in Functions
