@@ -41,13 +41,13 @@ def eval_source(filename, interpreter, source, debug=True, full_source=None, lin
         return value
 
     except lark.exceptions.UnexpectedToken as e:
-        print(f"{e.line}:{e.column} syntax error: expected one of {e.expected}"),
+        print(f"{filename}:{e.line}:{e.column} syntax error: expected one of {e.expected}"),
         print(e.get_context(source))
     except lark.exceptions.UnexpectedCharacters as e:
-        print(f"{e.line}:{e.column} syntax error: unexpected characters"),
+        print(f"{filename}:{e.line}:{e.column} syntax error: unexpected characters"),
         print(e.get_context(source))
     except lark.exceptions.UnexpectedEOF as e:
-        print(f"{e.line}:{e.column} syntax error: unexpected end of file"),
+        print(f"{filename}:{e.line}:{e.column} syntax error: unexpected end of file"),
         print(e.get_context(source))
     except JlException as e:
         print(e.get_backtrace(full_source))
