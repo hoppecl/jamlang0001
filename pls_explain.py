@@ -69,7 +69,7 @@ def run_file(path, debug=False):
         print(value)
 
 
-def repl(debug=True):
+def repl(debug=True, quiet=False):
     inter = Interpreter()
     full_source = ""
     line_offset = 0
@@ -85,7 +85,9 @@ def repl(debug=True):
             break
         full_source += source + '\n'
         value = eval_source("<repl>", inter, source, debug, full_source, line_offset)
-        print("->", value, value.get_comment())
+        if not quiet:
+            print("->", value, value.get_comment())
+
         inter.clear_backtrace()
         line_offset += 1
 
@@ -97,8 +99,10 @@ if __name__ == "__main__":
                       help="PlsExplain program to run")
     argp.add_argument("-d", "--debug", default=False, action="store_true",
                       help="print verbose debug info")
+    argp.add_argument("-q", "--quiet", default=False, action="store_true",
+                      help="don't print result of expressions when in interactive mode")
     args = argp.parse_args()
     if args.file is not None:
         run_file(args.file, args.debug)
     else:
-        repl(args.debug)
+        repl(args.debug, args.quiet)
