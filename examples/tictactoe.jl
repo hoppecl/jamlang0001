@@ -67,21 +67,21 @@ let spaces = fn() {
 let my_turn = fn() {
     let options = spaces();
     let choice = get(options, randint(0, len(options) - 1));
-    print("I go at " + str(choice + 1));
+    print("I go at index " + str(choice + 1));
     put(board, choice, "O");
 };
 
 let your_turn = fn() {
     let not_done = True;
     while (not_done) {
-        print("Your turn. Input the index of where you wish to place your mark");
+        print("Your turn. Input the index of where you wish to place your mark" /* prompt */);
         let choice = num(input());
         if (choice == ()) {
-            print("sorry I did not undestand that");
+            print("sorry I did not undestand that" /* error message */);
         } else if (choice < 1 | choice > 9) {
-            print("that is not on the board");
+            print("that is not on the board" /* error message */);
         } else if (get(board, choice - 1) == "X" | get(board, choice - 1) == "O") {
-            print("that spot is already taken");
+            print("that spot is already taken" /* error message */);
         } else {
             put(board, choice - 1, "X");
             not_done = False;
@@ -104,7 +104,7 @@ while (not_done) {
         my_turn();
         print_board();
         if (score()) {
-            print("I win!");
+            print("I win!" /* victory message */);
             not_done = False;
         };
     };
