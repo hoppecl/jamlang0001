@@ -114,6 +114,10 @@ class Interpreter(jlast.AstVisitor):
         if not isinstance(f, JlCallable):
             raise JlTypeError(self.backtrace,
                               c.source, f"{type(f).__name__} is not callable")
+        arity = f.get_arity()
+        if arity is not None and len(args) != arity:
+            raise JlTypeError(self.backtrace,
+                              c.source, f"wrong number of arguments")
         self.backtrace.append(c.source)
         r = f.call(self, args)
         self.backtrace.pop()

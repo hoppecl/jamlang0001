@@ -96,10 +96,18 @@ class JlString:
         if comment is None:
             comment = JlComment(f"the string \"{value}\"")
         self.comment = comment
-        
+
     def __str__(self):
         return str(self.value)
-    
+
+    def __add__(self, other):
+        if not isinstance(other, JlString):
+            raise TypeError()
+        return JlString(self.value + other.value,
+                        JlComment(f"{self.comment.text} concatenated with {other.comment.text}"))
+
+
+
 @dataclass
 class JlUnit:
     comment: JlComment = JlComment("unit")
@@ -121,7 +129,7 @@ class JlBool:
 
     def __str__(self):
         return str(self.value)
-    
+
     def __and__(self, other):
         if not isinstance(other, JlBool):
             raise TypeError()
@@ -133,26 +141,33 @@ class JlBool:
             raise TypeError()
         return JlBool(self.value and other.value,
                       JlComment(f"{self.comment.text} or {other.comment.text}"))
-    
+
     def __eq__(self, other):
         if not isinstance(other, JlBool):
             raise TypeError()
         return JlBool(self.value and other.value,
                       JlComment(f"{self.comment.text} is equal to {other.comment.text}"))
 
+
 class JlCallable:
-    pass
+    def get_arity(self):
+        return None
+
 
 class JlPrimitive(JlCallable):
-    def __init__(self, callback, comment=None):
+    def __init__(self, callback, arity=None, comment=None):
         self.callback = callback
         self.comment = comment
+        self.arity = arity
 
     def __repr__(self):
         return f"JlPrimitive({self.comment})"
 
     def call(self, interpreter, args):
-        self.callback(*args)
+        return self.callback(*args)
+
+    def get_arity(self):
+        return self.arity
 
 
 class JlClosure(JlCallable):
@@ -163,7 +178,7 @@ class JlClosure(JlCallable):
         self.comment = comment
 
     def __repr__(self):
-        return f"JlClosure()"
+        return "JlClosure()"
 
     def call(self, interpreter, args):
         env = Environment(self.environment)
@@ -171,3 +186,5 @@ class JlClosure(JlCallable):
             env.put(p, a, 0)
         return interpreter.eval_with_env(self.body, env)
 
+    def get_arity(self):
+        return len(self.params)

@@ -8,7 +8,13 @@ def jl_print(*args):
     else:
         print(*map(str, args))
 
+
+def jl_input():
+    return JlString(input(), JlComment("the user input"))
+
+
 prelude = Environment()
 prelude.bindings = {
-    "print": JlPrimitive(jl_print, JlComment("/*the print function*/"))
+    "print": JlPrimitive(jl_print, None, JlComment("the builtin print function")),
+    "input": JlPrimitive(jl_input,    0, JlComment("the builtin input function"))
 }
