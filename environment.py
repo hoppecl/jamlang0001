@@ -18,7 +18,9 @@ class Environment:
             depth = name.binding_depth
 
         if depth == 0:
-            return self.bindings[name.name]
+            if name.name in self.bindings:
+                return self.bindings[name.name]
+            return None
 
         return self.parent.get(name, depth - 1)
 

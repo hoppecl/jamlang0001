@@ -38,6 +38,15 @@ class UnboundVariable(JlException):
         return f"unbound variable {self.name.name}"
 
 
+class UninizializedVariable(JlException):
+    def __init__(self, bt, name):
+        super().__init__(bt, name.source)
+        self.name = name
+
+    def __str__(self):
+        return f"error: variable {self.name.name} was accessed before it was fully initialized"
+
+
 class JlTypeError(JlException):
     def __init__(self, bt, expr, msg):
         super().__init__(bt, expr)

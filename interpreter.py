@@ -48,15 +48,10 @@ class Interpreter(jlast.AstVisitor):
         value = self.visit(a.expr)
         self.environment.put(a.name, value)
         return value
-    
+
     def visit_declaration(self, d):
         value = self.visit(d.expr)
         self.environment.put(d.name, value)
-        return value
-    
-    def visit_declaration(self, a):
-        value = self.visit(a.expr)
-        self.environment.put(a.name, value)
         return value
 
     def visit_literal(self, l):
@@ -65,7 +60,7 @@ class Interpreter(jlast.AstVisitor):
     def visit_name(self, n):
         value = self.environment.get(n)
         if value is None:
-            raise UnboundVariable(self.backtrace, n)
+            raise UninizializedVariable(self.backtrace, n)
         return value
 
     def visit_bin_expr(self, e):
@@ -101,7 +96,7 @@ class Interpreter(jlast.AstVisitor):
 
     def visit_and_expr(self, e):
         return self.visit(e.lhs) & self.visit(e.rhs)
-        
+
     def visit_or_expr(self, e):
         lhs = self.visit(e.lhs)
         if not lhs.value:
@@ -125,10 +120,10 @@ class Interpreter(jlast.AstVisitor):
             return JlUnit()
         else:
             return r
-        
+
     def visit_fn_expr(self, f):
         return JlClosure(self.environment, f.params, f.body)
-        
+
     def visit_explain_expr(self, c):
         value = self.visit(c.expr)
         if value.comment is None:
@@ -146,4 +141,3 @@ class Interpreter(jlast.AstVisitor):
         elif e.else_body is not None:
             return self.visit(e.else_body)
         return JlUnit()
-    
