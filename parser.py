@@ -9,8 +9,8 @@ program : (expr ";")* [expr]
 
 
 COMMENT : /\/\*[^(\*\/)]*\*\//
-TRUE: "true"
-FALSE: "false"
+TRUE: "True"
+FALSE: "False"
 %import common.WS
 %import common.SIGNED_NUMBER
 %import common.ESCAPED_STRING
