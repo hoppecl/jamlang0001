@@ -209,6 +209,7 @@ Parenthesis around the condition are mandatory. The Braces cant be omitted, if t
 |`input()` | 0 |  Read single line and return it as a string. |
 | `str(arg)`| 1 |  Convert value to string.|
 | `cmnt()` | 1 | Convert value to comment.|
+| `num()` | 1 | Convert string to number. Returns `()`if the conversion fails.|
 
 
 

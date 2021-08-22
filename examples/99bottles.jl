@@ -9,8 +9,8 @@ let bottles = fn(n)
 
 let print_verse = fn(i) {
     let n = 99 - i;
-    print(bottles(n) + " of beer on the wall"     {/* the first line of verse number */ + cmnt(i)});
-    print(bottles(n) + " of beer"                 {/* the second line of verse number */ + cmnt(i)});
+    print(bottles(n) + " of beer on the wall"         {/* the first line of verse number */ + cmnt(i)});
+    print(bottles(n) + " of beer"                     {/* the second line of verse number */ + cmnt(i)});
     if (n > 0) {
         print("take one down, pass it around"         {/* the third line of verse number */ + cmnt(i)});
         print(bottles(n - 1) + " of beer on the wall" {/* the fouth line of verse number */ + cmnt(i)});

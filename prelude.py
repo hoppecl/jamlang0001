@@ -21,10 +21,21 @@ def jl_cmnt(arg):
     return JlComment(str(arg), JlComment(f"{arg.get_comment().value} as a comment"))
 
 
+def jl_num(arg):
+    try:
+        if isinstance(arg, JlString):
+            return JlNumber(float(arg.value), JlComment(f"{arg.get_comment().value} as a number"))
+    except ValueError:
+        pass
+
+    return JlUnit()
+
+
 prelude = Environment()
 prelude.bindings = {
     "print": JlPrimitive(jl_print, None, JlComment("the builtin print function")),
     "input": JlPrimitive(jl_input, 0, JlComment("the builtin input function")),
     "str": JlPrimitive(jl_str, 1, JlComment("the builtin str function")),
     "cmnt": JlPrimitive(jl_cmnt, 1, JlComment("the builtin cmnt function")),
+    "num": JlPrimitive(jl_num, 1, JlComment("the builtin cmnt function")),
 }
