@@ -43,11 +43,14 @@ class JlComment(Value):
 @dataclass(eq=False)
 class JlNumber(Value):
     def default_comment(self):
-        return JlComment(f"the number {self.value}")
+        return JlComment(f"the number {self}")
 
     def build_comment(self, name, other):
         return JlComment(f"the {name} of {self.get_comment().value} and {other.get_comment().value}")
 
+    def __str__(self):
+        return f"{self.value:g}"
+    
     def __add__(self, other):
         if not isinstance(other, JlNumber):
             raise TypeError()
