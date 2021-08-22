@@ -8,7 +8,7 @@ grammar = r"""
 program : (expr ";")* [expr]
 
 
-COMMENT : /\/\*[^(\*\/)]*\*\//
+COMMENT : /\/\*(\*(?!\/)|[^*])*\*\//
 TRUE: "True"
 FALSE: "False"
 %import common.WS

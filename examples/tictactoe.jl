@@ -1,4 +1,7 @@
-/*  Tic-Tac-Toe */;
+/*
+ *  Tic-Tac-Toe
+ *  Translated from https://rosettacode.org/wiki/Tic-tac-toe#Python
+ */;
 
 let board = list(1, 2, 3, 4, 5, 6, 7, 8, 9);
 let wins = list(
