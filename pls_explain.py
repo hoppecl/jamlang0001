@@ -35,7 +35,7 @@ def eval_source(filename, interpreter, source, debug=True, full_source=None, lin
         if debug:
             print("Global Environment after Evaluation:")
             for k, v in interpreter.environment.bindings.items():
-                print(f"{k} = {repr(v)} {v.comment or ''}")
+                print(f"{k} = {repr(v)}")
             print()
 
         return value
@@ -85,7 +85,7 @@ def repl(debug=True):
             break
         full_source += source + '\n'
         value = eval_source("<repl>", inter, source, debug, full_source, line_offset)
-        print("->", value, value.comment or "")
+        print("->", value, value.get_comment())
         inter.clear_backtrace()
         line_offset += 1
 

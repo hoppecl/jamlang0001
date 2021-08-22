@@ -1,8 +1,8 @@
-str = "test" /* the string test */
-i = 43 /* an integer */
-u = () /* the unit */
+let str = "test" /* the string test */;
+let i = 43 /* an integer */;
+let u = () /* the unit */;
 
-i2 = i /* the same integer */
+let i2 = i /* the same integer */;
 
-j = i2 /* the fourth integer variable */
-i = i + 1 /* the next index */
+let j = i2 /* the fourth integer variable */;
+let i = i + 1 /* the next index */;

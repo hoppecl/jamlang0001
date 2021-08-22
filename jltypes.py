@@ -1,42 +1,53 @@
 from dataclasses import dataclass
 from environment import Environment
 
-
-class JlComment:
-    def __init__(self, text, comment=None):
-        self.text = text
-        self.comment = comment
-
-    def __repr__(self):
-        if self.comment is not None:
-            return '/*' + self.text + " " + '*/' + str(self.comment)
-        return '/*' + self.text + '*/'
-
-    def __str__(self):
-        return '/*' + self.text + '*/'
-    
-    def __add__(self, other):
-        if not isinstance(other, JlComment):
-            raise TypeError()
-        return JlComment(self.text + other.text)
-    
 @dataclass
-class JlNumber:
-    value: float
-    comment: JlComment = None
-    
-    def __init__(self, value, comment=None):
-        self.value = value
-        if comment is None:
-            comment = JlComment(f"the number {value}")
-        self.comment = comment
+class Value:
+    value: object = None
+    _comment: object = None
 
-    def build_comment(self, name, other):
-        return JlComment(f"the {name} of {self.comment.text} and {other.comment.text}")
+    def default_comment(self):
+        return JlComment("something")
+
+    def get_comment(self):
+        if self._comment is not None:
+            return self._comment
+        return self.default_comment()
+
+    def set_comment(self, comment):
+        self._comment = comment
 
     def __str__(self):
         return str(self.value)
-    
+
+    def __eq__(self, other):
+        if type(self) != type(other):
+            res = False
+        else:
+            res = self.value == other.value
+        return JlBool(res, JlComment(f"{self.get_comment().value} is equal to {other.get_comment().value}"))
+
+@dataclass(eq=False)
+class JlComment(Value):
+    def default_comment(self):
+        return JlComment(f"a comment")
+
+    def __str__(self):
+        return '/*' + self.value + '*/'
+
+    def __add__(self, other):
+        if not isinstance(other, JlComment):
+            raise TypeError()
+        return JlComment(self.value + other.value)
+
+@dataclass(eq=False)
+class JlNumber(Value):
+    def default_comment(self):
+        return JlComment(f"the number {self.value}")
+
+    def build_comment(self, name, other):
+        return JlComment(f"the {name} of {self.get_comment().value} and {other.get_comment().value}")
+
     def __add__(self, other):
         if not isinstance(other, JlNumber):
             raise TypeError()
@@ -54,7 +65,7 @@ class JlNumber:
             raise TypeError()
         return JlNumber(self.value * other.value,
                         self.build_comment("product", other))
-    
+
     def __truediv__(self, other):
         if not isinstance(other, JlNumber):
             raise TypeError()
@@ -67,66 +78,45 @@ class JlNumber:
         return JlNumber(self.value % other.value,
                         self.build_comment("modulus", other))
 
-    def __eq__(self, other):
-        if not isinstance(other, JlNumber):
-            raise TypeError()
-        return JlBool(self.value == other.value,
-                      JlComment(f"{self.comment.text} is equal to {other.comment.text}"))
-
     def __lt__(self, other):
         if not isinstance(other, JlNumber):
             raise TypeError()
         return JlBool(self.value < other.value, 
-                      JlComment(f"{self.comment.text} is less than {other.comment.text}"))
+                      JlComment(f"{self.get_comment().value} is less than {other.get_comment().value}"))
 
     def __gt__(self, other):
         if not isinstance(other, JlNumber):
             raise TypeError()
         return JlBool(self.value > other.value, 
-                      JlComment(f"{self.comment.text} is greater than {other.comment.text}"))
+                      JlComment(f"{self.get_comment().value} is greater than {other.get_comment().value}"))
 
 
-@dataclass
-class JlString:
-    value: str
-    comment: JlComment = None
-
-    def __init__(self, value, comment=None):
-        self.value = value
-        if comment is None:
-            comment = JlComment(f"the string \"{value}\"")
-        self.comment = comment
-
-    def __str__(self):
-        return str(self.value)
+@dataclass(eq=False)
+class JlString(Value):
+    def default_comment(self):
+        return JlComment(f"the string \"{self.value}\"")
 
     def __add__(self, other):
         if not isinstance(other, JlString):
-            print("WTF", repr(other))
             raise TypeError()
         return JlString(self.value + other.value,
-                        JlComment(f"{self.comment.text} concatenated with {other.comment.text}"))
+                        JlComment(f"{self.get_comment().value} concatenated with {other.get_comment().value}"))
 
 
 
-@dataclass
-class JlUnit:
-    comment: JlComment = JlComment("unit")
+@dataclass(eq=False)
+class JlUnit(Value):
+    def default_comment(self):
+        return JlComment("the unit")
 
     def __str__(self):
         return "()"
 
 
-@dataclass
-class JlBool:
-    value: bool
-    comment: JlComment = None
-
-    def __init__(self, value, comment=None):
-        self.value = value
-        if comment is None:
-            comment = JlComment(f"the boolean \"{value}\"")
-        self.comment = comment
+@dataclass(eq=False)
+class JlBool(Value):
+    def default_comment(self):
+        return JlComment(f"the boolean \"{self.value}\"")
 
     def __str__(self):
         return str(self.value)
@@ -135,34 +125,30 @@ class JlBool:
         if not isinstance(other, JlBool):
             raise TypeError()
         return JlBool(self.value and other.value,
-                      JlComment(f"{self.comment.text} and {other.comment.text}"))
+                      JlComment(f"{self.get_comment().value} and {other.get_comment().value}"))
 
     def __or__(self, other):
         if not isinstance(other, JlBool):
             raise TypeError()
         return JlBool(self.value or other.value,
-                      JlComment(f"{self.comment.text} or {other.comment.text}"))
-
-    def __eq__(self, other):
-        if not isinstance(other, JlBool):
-            raise TypeError()
-        return JlBool(self.value and other.value,
-                      JlComment(f"{self.comment.text} is equal to {other.comment.text}"))
+                      JlComment(f"{self.get_comment().value} or {other.get_comment().value}"))
 
 
-class JlCallable:
-    def get_arity(self):
-        return None
+class JlCallable(Value):
+    pass
 
 
 class JlPrimitive(JlCallable):
     def __init__(self, callback, arity=None, comment=None):
+        super().__init__(None, comment)
         self.callback = callback
-        self.comment = comment
         self.arity = arity
 
+    def __eq__(self, other):
+        return JlBool(self is other,
+                      JlComment(f"{self.get_comment().value} is equal to {other.get_comment().value}"))
     def __repr__(self):
-        return f"JlPrimitive({self.comment})"
+        return f"JlPrimitive({self.get_comment()})"
 
     def call(self, interpreter, args):
         return self.callback(*args)
@@ -173,13 +159,13 @@ class JlPrimitive(JlCallable):
 
 class JlClosure(JlCallable):
     def __init__(self, environment, params, body, comment=None):
+        super().__init__(None, comment)
         self.environment = environment
         self.params = params
         self.body = body
-        self.comment = comment
 
-    def __repr__(self):
-        return "JlClosure()"
+    def __str__(self):
+        return "JlClosure({self.get_comment()})"
 
     def call(self, interpreter, args):
         env = Environment(self.environment)

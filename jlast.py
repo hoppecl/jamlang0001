@@ -279,7 +279,7 @@ class LiteralTransformer(visitors.Transformer):
         return Literal(self._source_loc(f), JlBool(False))
 
     def unit(self, u):
-        return Literal(self._source_loc(u), JlUnit())
+        return Literal(self._source_loc(u[0]), JlUnit())
 
     def CNAME(self, n):
         return str(n)

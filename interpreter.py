@@ -41,7 +41,7 @@ class Interpreter(jlast.AstVisitor):
             raise JlTypeError(self.backtrace, e.location,
                               f"type {type(comment).__name__} can not be used to explain values")
         value = copy(value)
-        value.comment = comment
+        value.set_comment(comment)
         return value
 
     def visit_assignment(self, a):
@@ -91,6 +91,7 @@ class Interpreter(jlast.AstVisitor):
                 return lhs > rhs
             assert False
         except TypeError:
+            raise
             raise JlTypeError(self.backtrace, e.location,
                               f"`{e.op}` not possible for types {type(lhs).__name__} and {type(rhs).__name__}")
 
@@ -125,10 +126,7 @@ class Interpreter(jlast.AstVisitor):
         return JlClosure(self.environment, f.params, f.body)
 
     def visit_explain_expr(self, c):
-        value = self.visit(c.expr)
-        if value.comment is None:
-            return JlUnit()
-        return value.comment
+        return self.visit(c.expr).get_comment()
 
     def visit_while_expr(self, e):
         value = JlUnit()
