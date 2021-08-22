@@ -1,1 +1,2 @@
-print("test" /*the string "test"*/);
+1 let n = 0;
+n;

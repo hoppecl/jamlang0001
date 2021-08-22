@@ -102,6 +102,7 @@ class JlString:
 
     def __add__(self, other):
         if not isinstance(other, JlString):
+            print("WTF", repr(other))
             raise TypeError()
         return JlString(self.value + other.value,
                         JlComment(f"{self.comment.text} concatenated with {other.comment.text}"))
@@ -139,7 +140,7 @@ class JlBool:
     def __or__(self, other):
         if not isinstance(other, JlBool):
             raise TypeError()
-        return JlBool(self.value and other.value,
+        return JlBool(self.value or other.value,
                       JlComment(f"{self.comment.text} or {other.comment.text}"))
 
     def __eq__(self, other):

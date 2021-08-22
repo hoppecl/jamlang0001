@@ -131,6 +131,7 @@ class Interpreter(jlast.AstVisitor):
         return value.comment
 
     def visit_while_expr(self, e):
+        value = JlUnit()
         while self.visit(e.cond).value:
             value = self.visit(e.body)
         return value
