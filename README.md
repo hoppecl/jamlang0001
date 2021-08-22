@@ -137,6 +137,22 @@ Note: If we would use parenthesis to group the comments, the parser would interp
 | `Number`| floating point numbers |
 | `Bool`| `True`or `False`|
 | `Unit`| only the value `()`|
+| `List`| Lists of values |
+
+#### Lists    
+Currently there is no special syntax for lists, instead the builtin functions `list`,`append`,`put` and `get`have to be used to create and manipulate Lists.
+
+    >>> let l = list(1, 2, 3)
+    >>> print(l)
+    [1, 2, 3] /*a list of the number 1 and the number 2 and the number 3*/
+    >>> append(l, "world")
+    >>> print(l)
+    [1, 2, 3, 4] /*a list of the number 1 and the number 2 and the number 3 and the string "4"*/
+    >>> print(get(l, 2))
+    3 /*the number 3*/
+    >>> put(l, 0, "hallo")
+    >>> print(l)
+    [hallo, 2, 3, world] /*a list of the string "hallo" and the number 2 and the number 3 and the string "world"*/
 
 ### Syntax
 The Syntax is Expression based.
@@ -203,13 +219,18 @@ Parenthesis around the condition are mandatory. The Braces cant be omitted, if t
 
 ### Build in Functions
 
-| Function | No. of Arguments | Description  |
-|--|--|--|
-|  `print(*arg)` | any | Print any number of values. When called with a single argument, the arguments comment is printed as well |
-|`input()` | 0 |  Read single line and return it as a string. |
-| `str(arg)`| 1 |  Convert value to string.|
-| `cmnt()` | 1 | Convert value to comment.|
-| `num()` | 1 | Convert string to number. Returns `()`if the conversion fails.|
+| Function | Description  |
+|--|--|
+|  `print(args...)` | Print any number of values. When called with a single argument, the arguments comment is printed as well |
+|`input()` |  Read single line and return it as a string. |
+| `str(value)` |  Convert value to string.|
+| `cmnt(value)` | Convert value to comment.|
+| `num(value)` | Convert string to number. Returns `()`if the conversion fails.|
+| `list(args...)` | Create list containing the arguments. |
+| `append(list, value)`| Append value to list |
+| `put(list, index, value)`|Put value into list |
+| `get(list, index)`| Get value out of list |
+
 
 
 
