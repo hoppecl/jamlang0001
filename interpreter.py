@@ -38,7 +38,7 @@ class Interpreter(jlast.AstVisitor):
         value = self.visit(e.expr)
         comment = self.visit(e.comment)
         if not isinstance(comment, JlComment):
-            raise JlTypeError(self.backtrace, e.source,
+            raise JlTypeError(self.backtrace, e.location,
                               f"type {type(comment).__name__} can not be used to explain values")
         value = copy(value)
         value.comment = comment
@@ -91,7 +91,7 @@ class Interpreter(jlast.AstVisitor):
                 return lhs > rhs
             assert False
         except TypeError:
-            raise JlTypeError(self.backtrace, e.source,
+            raise JlTypeError(self.backtrace, e.location,
                               f"`{e.op}` not possible for types {type(lhs).__name__} and {type(rhs).__name__}")
 
     def visit_and_expr(self, e):
@@ -108,12 +108,12 @@ class Interpreter(jlast.AstVisitor):
         args = list(map(self.visit, c.args))
         if not isinstance(f, JlCallable):
             raise JlTypeError(self.backtrace,
-                              c.source, f"{type(f).__name__} is not callable")
+                              c.location, f"{type(f).__name__} is not callable")
         arity = f.get_arity()
         if arity is not None and len(args) != arity:
             raise JlTypeError(self.backtrace,
-                              c.source, f"wrong number of arguments")
-        self.backtrace.append(c.source)
+                              c.location, f"wrong number of arguments")
+        self.backtrace.append(c.location)
         r = f.call(self, args)
         self.backtrace.pop()
         if r is None:

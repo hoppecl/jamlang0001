@@ -4,18 +4,17 @@ import lark
 import sys
 import argparse
 from parser import parser
-from jlast import TransformLiterals, ToAst, AstPrinter
+from jlast import LiteralTransformer, ToAst, AstPrinter
 from interpreter import Interpreter
 from resolver import Resolver
-from exceptions import JlException
+from exceptions import JlException, format_backtrace
 from jltypes import JlUnit, JlComment
 
 
-to_ast_transformer = ToAst()
-literal_transformer = TransformLiterals()
-
-
-def eval_source(interpreter, source, debug=True):
+def eval_source(filename, interpreter, source, debug=True, full_source=None, line_offset=0):
+    if full_source is None:
+        full_source = source
+        
     try:
         parse_tree = parser.parse(source)
         if debug:
@@ -23,8 +22,8 @@ def eval_source(interpreter, source, debug=True):
             print(parse_tree.pretty())
             print()
     
-        tree_with_literals = literal_transformer.transform(parse_tree)
-        ast = to_ast_transformer.visit(tree_with_literals)
+        tree_with_literals = LiteralTransformer(filename, line_offset).transform(parse_tree)
+        ast = ToAst(filename, line_offset).visit(tree_with_literals)
         Resolver(interpreter.environment).visit(ast)
         if debug:
             print("Abstract Syntax Tree:")
@@ -51,7 +50,10 @@ def eval_source(interpreter, source, debug=True):
         print(f"{e.line}:{e.column} syntax error: unexpected end of file"),
         print(e.get_context(source))
     except JlException as e:
-        print(e.get_backtrace(source))
+        print(e.get_backtrace(full_source))
+    except RecursionError:
+        print(format_backtrace(interpreter.backtrace, full_source))
+        print("maximum recursion depth exceded")
 
     return JlUnit(JlComment(":("))
 
@@ -61,7 +63,7 @@ def run_file(path, debug=False):
         source = f.read()
 
     i = Interpreter()
-    value = eval_source(i, source, debug=debug)
+    value = eval_source(path, i, source, debug=debug)
     if debug:
         print("Program Return Value:")
         print(value)
@@ -69,6 +71,8 @@ def run_file(path, debug=False):
 
 def repl(debug=True):
     inter = Interpreter()
+    full_source = ""
+    line_offset = 0
     while True:
         print(">>> ", end='')
         try:
@@ -79,9 +83,11 @@ def repl(debug=True):
         except EOFError:
             print()
             break
-        value = eval_source(inter, source, debug)
+        full_source += source + '\n'
+        value = eval_source("<repl>", inter, source, debug, full_source, line_offset)
         print("->", value, value.comment or "")
         inter.clear_backtrace()
+        line_offset += 1
 
 
 if __name__ == "__main__":
