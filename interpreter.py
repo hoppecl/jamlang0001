@@ -29,6 +29,7 @@ class Interpreter(jlast.AstVisitor):
     def visit_block(self, b):
         saved_env = self.environment
         self.environment = Environment(saved_env)
+        value = JlUnit();
         for stmt in b.exprs:
            value = self.visit(stmt)
         self.environment = saved_env
@@ -118,7 +119,8 @@ class Interpreter(jlast.AstVisitor):
         try:
             r = f.call(self, args)
         except JlException as e:
-            e.backtrace = self.backtrace
+            if len(e.backtrace) == 0:
+                e.backtrace = self.backtrace
             raise e
         
         self.backtrace.pop()
