@@ -57,6 +57,9 @@ class Resolver(AstVisitor):
     def visit_bin_expr(self, e):
         self.visit(e.lhs)
         self.visit(e.rhs)
+        
+    def visit_unary_expr(self, e):
+        self.visit(e.expr)
  
     def visit_and_expr(self, e):
         self.visit(e.lhs)

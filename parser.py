@@ -28,8 +28,10 @@ FALSE: "False"
          | add_expr
 !?add_expr : add_expr ("+" | "-") mul_expr -> bin_expr
           | mul_expr
-!?mul_expr : mul_expr ("*" | "/" | "%") prim_expr -> bin_expr
-           | prim_expr
+!?mul_expr : mul_expr ("*" | "/" | "%") unary_expr -> bin_expr
+           | unary_expr
+!?unary_expr : ("!" | "-") unary_expr
+             | prim_expr
 ?prim_expr : COMMENT
            | TRUE
            | FALSE

@@ -92,10 +92,22 @@ class Interpreter(jlast.AstVisitor):
                 return lhs > rhs
             assert False
         except TypeError:
-            raise
             raise JlTypeError(f"`{e.op}` not possible for types {type(lhs).__name__} and {type(rhs).__name__}",
-                              self.backtrace, e.location,)
+                              self.backtrace, e.location)
 
+    def visit_unary_expr(self, e):
+        expr = self.visit(e.expr)
+        try:
+            if e.op == '!':
+                return expr.not_()
+            if e.op == '-':
+                return -expr
+            assert False
+        except TypeError:
+            raise JlTypeError(f"`{e.op}` not possible for type {type(expr).__name__}",
+                              self.backtrace, e.location)
+        
+        
     def visit_and_expr(self, e):
         return self.visit(e.lhs) & self.visit(e.rhs)
 

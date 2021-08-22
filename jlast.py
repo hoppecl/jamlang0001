@@ -44,9 +44,13 @@ class BinExpr(Expr):
     def accept(self, visitor):
         return visitor.visit_bin_expr(self)
 
-    def get_location(self):
-        return SourceLoc(self.op.line, self.op.column)
+@dataclass
+class UnaryExpr(Expr):
+    op: Token
+    expr: Expr
 
+    def accept(self, visitor):
+        return visitor.visit_unary_expr(self)
 
 @dataclass
 class Literal(Expr):
@@ -219,6 +223,13 @@ class AstPrinter(AstVisitor):
         self.visit(e.lhs)
         self.visit(e.rhs)
         self.indent -= 1
+        
+    def visit_unary_expr(self, e):
+        self.print_indent()
+        print("Unary", e.op)
+        self.indent += 1
+        self.visit(e.expr)
+        self.indent -= 1
 
     def visit_if_expr(self, e):
         self.print_indent()
@@ -311,6 +322,10 @@ class ToAst(visitors.Interpreter):
     def bin_expr(self, tree):
         return BinExpr(self._source_loc(tree),
                        *self.visit_children(tree))
+
+    def unary_expr(self, tree):
+        return UnaryExpr(self._source_loc(tree),
+                         *self.visit_children(tree))
 
     def name(self, tree):
         return Name(self._source_loc(tree), *self.visit_children(tree))

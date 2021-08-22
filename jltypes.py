@@ -27,6 +27,10 @@ class Value:
             res = self.value == other.value
         return JlBool(res, JlComment(f"{self.get_comment().value} is equal to {other.get_comment().value}"))
 
+    def not_(self):
+        raise TypeError()
+
+    
 @dataclass(eq=False)
 class JlComment(Value):
     def default_comment(self):
@@ -92,6 +96,10 @@ class JlNumber(Value):
             raise TypeError()
         return JlBool(self.value > other.value, 
                       JlComment(f"{self.get_comment().value} is greater than {other.get_comment().value}"))
+    
+    def __neg__(self):
+        return JlNumber(-self.value,
+                       JlComment(f"the negative of{self.get_comment().value}"))
 
 
 @dataclass(eq=False)
@@ -136,6 +144,9 @@ class JlBool(Value):
         return JlBool(self.value or other.value,
                       JlComment(f"{self.get_comment().value} or {other.get_comment().value}"))
 
+    def not_(self):
+        return JlBool(not self.value,
+                      JlComment(f"{self.get_comment().value}, not"))
 
 class JlCallable(Value):
     pass
