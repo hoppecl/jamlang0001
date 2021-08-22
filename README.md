@@ -1,23 +1,24 @@
 ﻿# PlsExplain (aka jamlang0001)
-A small dynamically typed programming language with first-class comments.
+A small dynamically typed programming language with first-class comments, where every value is explained by a comment.
+
+[Main Repo](https://github.com/hoppecl/jamlang0001)
 
 ### Running the Interpreter
 #### Dependencies
 The interpreter depends on python3 and [lark](https://github.com/lark-parser/lark). Lark can be installed with `pip install lark`.
 #### REPL
-When the interpreter is launched without command line parameters it starts in interactive mode
+Invoke the interpreter without command line arguments to start the interactive mode
     
     $ ./pls_explain.py
     >>> print("hello world")
     hello world /*the string "hello world"*/
     >>>
     
-  To exit the REPL press `Ctrl-D`.
+  To exit  press `Ctrl-D`.
   
- #### Running a Program from a File
-To execute a Program written in *PlsExplain*, pass the pass to the program as the first command line argument.
+To execute a Program written in *PlsExplain*, pass the path to the program as the first command line argument.
 
-    $ ./pls_explain.py examples/hello_world.jl
+    $ ./pls_explain.py examples/hello_world.pe
     Hello World /*the string "Hello World"*/
 	
 ### First-Class Comments
@@ -25,20 +26,22 @@ Comments are first-class values in *PlsExplain*. This means that they are expres
     
     >>> let comment = /* This is a comment */;
     >>> print(comment)
-    /* This is a comment */
+    /* This is a comment */ /* a comment */
     >>> print(/*another comment*/)
-    /*another comment*/
+    /*another comment*/ /* a comment */
  
-At a first glance comments might seem to be equivalent to strings. The difference  is that comments can be used to explain something: In *PlsExplain* all values have an associated comment that explains the value. When called with a single argument, `print` shows the associated comment. To associate a comment with a value, simply write it next to the expression:
+At a first glance comments might seem to be equivalent to strings. The difference  is that comments can be used to explain something. In *PlsExplain* all values have an associated comment that explains the value. To explain a value with a comment, simply write it next to the expression. When called with a single argument, `print` shows the associated comment.
 
     >>> let x = 40 + 2 /* the number fourtytwo */;
     >>> print(x)
-    42.0 /* the number fourtytwo */
+    42 /* the number fourtytwo */
  
  Explaining comments don't have to be comment-literals:
  
      >>> let comment = /* this is a comment */
-     >>> let x = 42.0 comment
+     >>> let x = 42 comment
+     >>> print(x)
+     42 /* this is a comment */
  
  Trying to explain a value with something that is not a comment obviously results in a type error.
  
@@ -51,15 +54,10 @@ At a first glance comments might seem to be equivalent to strings. The differenc
     type error: type JlString can not be used to explain values
     
     >>> let s = "not a comment either"
-    >>> 42 s
-    Backtrace (most recent call last):
-
-    line 1:
-    42 s
-    ^~~~
-    type error: type JlString can not be used to explain values
     
- #### Auto-Comments
+   If you see this error, it often means that you have forgotten to separate two expressions with an semicolon.
+    
+ #### Auto-generated Comments
  If a value is not explained by an explicit comment, the interpreter automagically generates a helpful comment.
  
     >>> let x = 4
@@ -107,7 +105,7 @@ Since comments are first-class values we can manipulate them on the fly. This al
             /* lets generate a helpful comment for the return value */;
             /* (Comments can be concatenated with +) */
             let comment = /* the factorial of */ + n?;
-            /* explain the return value with the generated comment, by writing it to the right of the return value */
+            /* explain the return value with the generated comment */
             (fact(n - 1) * n) comment;
          }
     };
@@ -119,15 +117,21 @@ The output of this program is more concise:
     24.0 /* the factorial of the number of hours i've slept*/
 
 #### Meta-Comments and Meta-Meta-Comments and ...
-Since comments are first-class values, comments can also be explained by comments. Obviously comments explaining a comment can also be explained by comments.
+Since comments are first-class values, comments are also explained by comments. Obviously comments explaining a comment are also explained by comments which in turn are explained by comments and so on.
 
-    >>> let x = a /* comment */ /* meta-comment */ /* meta-meta-comment */
+    >>> let x = 42 /* comment */ /* meta-comment */ /* meta-meta-comment */
+    >>> print(x)
+    42 /* comment */
+    >>> print(x?)
+    /* comment */ /* meta-comment */
+    >>> print(x??)
+    /* meta-comment */ /* meta-meta-comment */
+    >>> print(x???)
+    /* meta-meta-comment */ /*a comment*/  <-- autogenerated meta-meta-meta-comment
+    >>> print(x????)
+    /*a comment*/ /*a comment*/
+    ...
 
-Comments are right-associativ, so the previous statement is equivialent to
-
-    >>> let x = (a {/* comment */ {/* meta-comment */ /* meta-meta-comment */}}}
-
-Note: If we would use parenthesis to group the comments, the parser would interpret the expression as an attempt to call the function`a`. Conveniently, blocks delimited by curly-braces evaluate to the value of the their last expression, which means that they can be used instead.
 
 ### Datatypes
 |Type| Description |
@@ -147,7 +151,7 @@ Currently there is no special syntax for lists, instead the builtin functions `l
     [1, 2, 3] /*a list of the number 1 and the number 2 and the number 3*/
     >>> append(l, "world")
     >>> print(l)
-    [1, 2, 3, 4] /*a list of the number 1 and the number 2 and the number 3 and the string "4"*/
+    [1, 2, 3, world] /*a list of the number 1 and the number 2 and the number 3 and the string "world"*/
     >>> print(get(l, 2))
     3 /*the number 3*/
     >>> put(l, 0, "hallo")
@@ -198,7 +202,9 @@ Variables are declared with the keyword `let` and must be initialized. Variables
 Assignments evaluate to the assigned value.
 
 #### Unary Expressions
-`-a` `!b` Nothing unusual.
+`-a` `!b` 
+
+Nothing unusual.
 
 #### Binary Expressions
 `a + b`
@@ -227,7 +233,7 @@ Parenthesis around the condition are mandatory. Braces around single expressions
 
 Parenthesis around the condition are mandatory. The Braces cant be omitted, if the body is a single expression. While loops evaluate to the value of the loop body during the last iteration.
 
-### Build in Functions
+### Builtin Functions
 
 | Function | Description  |
 |--|--|

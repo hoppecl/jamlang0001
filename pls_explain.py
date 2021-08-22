@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 
 import lark
-import sys
 import argparse
+import readline
+
 from parser import parser
 from jlast import LiteralTransformer, ToAst, AstPrinter
 from interpreter import Interpreter
@@ -74,9 +75,8 @@ def repl(debug=True, quiet=False):
     full_source = ""
     line_offset = 0
     while True:
-        print(">>> ", end='')
         try:
-            source = input()
+            source = input('>>> ')
         except KeyboardInterrupt:
             print()
             continue
