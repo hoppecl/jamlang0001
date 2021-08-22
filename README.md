@@ -201,6 +201,14 @@ Parenthesis around the condition are mandatory. Braces around single expressions
 `while (condition) { do_something() }`
 Parenthesis around the condition are mandatory. The Braces cant be omitted, if the body is a single expression. While loops evaluate to the value of the loop body during the last iteration.
 
+### Build in Functions
+
+| Function | No. of Arguments | Description  |
+|--|--|--|
+|  `print(*arg)` | any | Print any number of values. When called with a single argument, the arguments comment is printed as well |
+|`input()` | 0 |  Read single line and return it as a string. |
+| `str(arg)`| 1 |  Convert value to string.|
+| `cmnt()` | 1 | Convert value to comment.|
 
 
 
