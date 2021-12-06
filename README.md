@@ -1,6 +1,8 @@
 ﻿# PlsExplain (aka jamlang0001)
 A small dynamically typed programming language with first-class comments, where every value is explained by a comment.
 
+This language was developed within 48 hours for the [first langjam](https://github.com/langjam/jam0001).
+
 [Main Repo](https://github.com/hoppecl/jamlang0001)
 
 ### Running the Interpreter
